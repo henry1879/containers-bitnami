@@ -45,7 +45,7 @@ steps:
       - --vpc-connector=$_VPC_CONNECTOR
       - --add-cloudsql-instances=$_CONNECTION
       - --service-account=$_SERVICE_ACCOUNT
-      - --set-env-vars=MOODLE_USERNAME=admin,MOODLE_PASSWORD=Admin@123,MOODLE_DATABASE_HOST=$_CONNECTION,MOODLE_DATABASE_USER=moodleuser,MOODLE_DATABASE_PASSWORD=moodlepass,MOODLE_DATABASE_TYPE=mysql
+      - --set-env-vars=MOODLE_USERNAME=admin,MOODLE_PASSWORD=Admin@123,MOODLE_DATABASE_HOST=$_CONNECTION,MOODLE_DATABASE_USER=moodleuser,MOODLE_DATABASE_PASSWORD=moodlepass,MOODLE_DATABASE_TYPE=mysqli
 #images:
 #  - $_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$TAG_NAME
 #  - $_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:latest
