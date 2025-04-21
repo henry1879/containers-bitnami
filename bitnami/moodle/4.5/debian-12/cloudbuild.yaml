@@ -23,7 +23,7 @@ steps:
   - name: 'gcr.io/kaniko-project/executor:latest'
     id: Build Docker image (Kaniko)
     args:
-      - --context=dir://moodle
+      - --context=dir://bitnami/moodle/4.5/debian-12
       - --dockerfile=Dockerfile
       - --destination=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$TAG_NAME
       - --destination=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:latest
