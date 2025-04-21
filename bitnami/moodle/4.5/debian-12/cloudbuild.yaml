@@ -1,0 +1,52 @@
+options:
+  machineType: 'E2_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY
+  substitution_option: ALLOW_LOOSE
+  dynamic_substitutions: true
+timeout: 1200s
+
+substitutions:
+  _SERVICE_NAME: moodle
+  _REGION: asia-southeast1
+  _CONNECTION: abs-techcompany-dev-2025:asia-southeast1:sql-moodle-cloudrun
+  _VPC_CONNECTOR: vpc-connector-cloudrun
+  _SERVICE_ACCOUNT: build-sa@abs-techcompany-dev-2025.iam.gserviceaccount.com
+  _REPO_NAME: bitnami
+  _IMAGE_NAME: moodle
+  _DB_NAME: moodle
+  _DB_USER: moodleuser
+  _DB_PASS: moodlepass
+
+
+steps:
+  # STEP 1: Build image with Kaniko + Cache enabled (FAST!)
+  - name: 'gcr.io/kaniko-project/executor:latest'
+    id: Build Docker image (Kaniko)
+    args:
+      - --context=dir://moodle
+      - --dockerfile=Dockerfile
+      - --destination=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$TAG_NAME
+      - --destination=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:latest
+      - --cache=true
+
+  # STEP 2: Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: Deploy to Cloud Run
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - $_SERVICE_NAME
+      - --image=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$TAG_NAME
+      - --platform=managed
+      - --region=$_REGION
+      - --port=8080
+      - --allow-unauthenticated
+      - --vpc-connector=$_VPC_CONNECTOR
+      - --add-cloudsql-instances=$_CONNECTION
+      - --service-account=$_SERVICE_ACCOUNT
+      - --set-env-vars=DB_NAME=moodle,DB_USER=moodleuser,DB_PASS=moodlepass,DB_HOST=/cloudsql/$_CONNECTION,CLOUD_SQL_CONNECTION_NAME=$_CONNECTION
+
+#images:
+#  - $_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$TAG_NAME
+#  - $_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:latest
